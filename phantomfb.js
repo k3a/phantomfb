@@ -101,7 +101,7 @@ page.onLoadFinished = function (status) {
                 return {
                     picture: ppic.style.backgroundImage.match('url\\("?(.*)"?\\)')[1], // stip url( ) around link
                     name: ppic.attributes['aria-label'].nodeValue,
-                    profile: 'https://www.facebook.com' + plnk.split('&__xt')[0],
+                    profile: 'https://www.facebook.com' + plnk.split('__xt')[0],
                 };
             });
 

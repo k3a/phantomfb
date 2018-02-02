@@ -13,6 +13,7 @@ var urlparams = require('./urlparams');
 var config = {
     email: "fb-email@addr.com",
     password: "mysecretpw",
+    listen: "127.0.0.1:8071",
 };
 
 // force BB10 UA for simpler interface
@@ -31,12 +32,10 @@ function doLogin() {
 
 // prepare webserver and listen for request
 function HttpListen() {
-    const port = 8181;
-
     var server = webserver.create();
-    console.log('listening on :' + port);
+    console.log('listening on ' + config.listen);
 
-    var service = server.listen(port, function (request, response) {
+    var service = server.listen(config.listen, function (request, response) {
         //console.log(request.method + ' ' + request.url);
         //console.log(JSON.stringify(request));
         var params = urlparams.getAllUrlParams(request.url);
@@ -55,8 +54,10 @@ function HttpListen() {
             response.close();
         };
 
+        // /search 
         if (request.url.indexOf('/search') === 0) {
             doSearchFB(params.q, response);
+        // not found
         } else {
             response.statusCode = 404;
             response.write('not found');
@@ -130,6 +131,18 @@ function doSearchFB(keyword, responseObj) {
     page.open('https://m.facebook.com/graphsearch/str/' + encodeURI(keyword) + '/keywords_search?source=result');
 }
 
+function mergeObjects() {
+    var resObj = {};
+    for(var i=0; i < arguments.length; i += 1) {
+         var obj = arguments[i],
+             keys = Object.keys(obj);
+         for(var j=0; j < keys.length; j += 1) {
+             resObj[keys[j]] = obj[keys[j]];
+         }
+    }
+    return resObj;
+}
+
 // parse config
 if (system.args.length == 2) {
     var data = fs.read(system.args[1], 'utf8');
@@ -138,7 +151,7 @@ if (system.args.length == 2) {
         phantom.exit(1);
     }
 
-    config = JSON.parse(data);
+    config = mergeObjects(config, JSON.parse(data));
     data = "";
 
     if (config == null) {

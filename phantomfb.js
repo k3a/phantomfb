@@ -94,8 +94,6 @@ page.onLoadFinished = function (status) {
             phantom.state = "ready";
             setTimeout(HttpListen, 0);
         } else if (phantom.state === "search") {
-            //logPage(page);
-
             var resp = page.evaluate(function () {
                 // get profile picture element by css selector
                 var ppic = document.querySelector('div#BrowseResultsContainer i.profpic');
@@ -116,9 +114,6 @@ page.onLoadFinished = function (status) {
 
             phantom.response.sendOK(resp);
             phantom.state = "ready";
-            //console.log(JSON.stringify(resp));
-
-            //phantom.exit();
         }
     }
 };

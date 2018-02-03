@@ -82,6 +82,15 @@ page.onLoadFinished = function (status) {
             phantom.state = "logging-in";
             doLogin();
         } else if (phantom.state === "logging-in") {
+            var loginOK = page.evaluate(function () {
+                return document.querySelector('form#login_form') == null;
+            });
+            
+            if (!loginOK) {
+                console.log("Error: Wrong user name or password");
+                return;
+            }
+
             phantom.state = "ready";
             setTimeout(HttpListen, 0);
         } else if (phantom.state === "search") {

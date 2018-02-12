@@ -57,7 +57,7 @@ function HttpListen() {
         // /search 
         if (request.url.indexOf('/search') === 0) {
             doSearchFB(params.q, response);
-        // not found
+            // not found
         } else {
             response.statusCode = 404;
             response.write('not found');
@@ -73,6 +73,10 @@ function logPage(page) {
     fs.write('log.html', page.content, 'w');
 }
 
+function isNumber(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
 // for every successful page load
 page.onLoadFinished = function (status) {
     console.log((!phantom.state ? "no-state" : phantom.state) + ": " + status);
@@ -85,7 +89,7 @@ page.onLoadFinished = function (status) {
             var loginOK = page.evaluate(function () {
                 return document.querySelector('form#login_form') == null;
             });
-            
+
             if (!loginOK) {
                 console.log("Error: Wrong user name or password");
                 return;
@@ -130,6 +134,12 @@ function doSearchFB(keyword, responseObj) {
         return
     }
 
+    // remove space if it looks like a phone number
+    keywordNoSpace = keyword.replace(/\s+/g, '')
+    if (isNumber(keywordNoSpace)) {
+        keyword = keywordNoSpace;
+    }
+
     phantom.response = responseObj;
     phantom.state = 'search';
     page.open('https://m.facebook.com/graphsearch/str/' + encodeURI(keyword) + '/keywords_search?source=result');
@@ -137,12 +147,12 @@ function doSearchFB(keyword, responseObj) {
 
 function mergeObjects() {
     var resObj = {};
-    for(var i=0; i < arguments.length; i += 1) {
-         var obj = arguments[i],
-             keys = Object.keys(obj);
-         for(var j=0; j < keys.length; j += 1) {
-             resObj[keys[j]] = obj[keys[j]];
-         }
+    for (var i = 0; i < arguments.length; i += 1) {
+        var obj = arguments[i],
+            keys = Object.keys(obj);
+        for (var j = 0; j < keys.length; j += 1) {
+            resObj[keys[j]] = obj[keys[j]];
+        }
     }
     return resObj;
 }
